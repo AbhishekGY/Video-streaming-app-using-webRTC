@@ -9,6 +9,16 @@
 'use strict';
 const namespace = prepareNamespace(window.location.hash, true);
 
+const VideoFX = class {
+	constructor() {
+		this.filters = ['grayscale', 'sepia', 'noir', 'psychedelic', 'none'];
+	}
+	cycleFilter() {
+		const filter = this.filters.shift();
+		this.filters.push(filter);
+		return filter;
+	}
+};
 
 /**
  *  Global Variables: $self and $peer
@@ -55,6 +65,21 @@ document.querySelector('#call-button')
  */
 requestUserMedia($self.mediaConstraints);
 
+$self.filters = new VideoFX();
+
+document.querySelector('#self')
+	.addEventListener('click', handleSelfVideo);
+	
+	
+function handleSelfVideo(event) {
+	if ($peer.connection.connectionState !== 'connected') return;
+	const filter = `filter-${$self.filters.cycleFilter()}`;
+	const fdc = $peer.connection.createDataChannel(filter);
+	fdc.onclose = function() {
+		console.log(`Remote peer has closed the ${filter} data channel`);
+	};
+	event.target.className = filter;
+}
 
 
 /**
@@ -125,6 +150,8 @@ function resetPeer(peer) {
 	peer.connection.onnegotiationneeded = handleRtcConnectionNegotiation;
 	peer.connection.onicecandidate = handleRtcIceCandidate;
 	peer.connection.ontrack = handleRtcPeerTrack;
+	peer.connection.onconnectionstatechange = handleRtcConnectionStateChange;
+	peer.connection.ondatachannel = handleRtcDataChannel;
 }
 
 function handleRtcPeerTrack({ track, streams: [stream] }) {
@@ -132,6 +159,22 @@ function handleRtcPeerTrack({ track, streams: [stream] }) {
 	displayStream(stream, '#peer');
 }
 
+function handleRtcConnectionStateChange() {
+	const connection_state = $peer.connection.connectionState;
+	console.log(`The connection state is now ${connection_state}`);
+	document.querySelector('body').className = connection_state;
+}
+
+function handleRtcDataChannel({ channel }) {
+	const label = channel.label;
+	console.log(`Data channel added for ${label}`);
+	if (label.startsWith('filter-')) {
+		document.querySelector('#peer').className = label;
+		channel.onopen = function() {
+			channel.close();
+		};
+	}
+}
 
 /**
  * =========================================================================
