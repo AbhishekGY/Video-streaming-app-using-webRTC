@@ -34,6 +34,15 @@
 			poster="img/placeholder.png">
 		</video>
 	</article>
+	<aside id="chat">
+		<h2 class="preserve-access">Text Chat</h2>
+		<ol id="chat-log"></ol>
+		<form id="chat-form" action="#null">
+			<label for="chat-msg" class="preserve-access">Compose Message</label>
+			<input type="text" id="chat-msg" name="chat-msg" autocomplete="off" />
+			<button type="submit" id="chat-btn">Send</button>
+		</form>
+	</aside>
 </main>
 
 <script src="/socket.io/socket.io.js"></script>

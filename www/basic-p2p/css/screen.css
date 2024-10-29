@@ -20,7 +20,11 @@ html {
 	box-sizing: border-box;
 }
 #interface {
+	height: 100vh;
 	padding: 22px;
+	display: grid;
+	grid-gap: 11px;
+	grid-template-rows: auto auto 1fr; /* heading videos chatbox */
 }
 #header {
 	margin-bottom: 11px;
@@ -62,12 +66,22 @@ button {
 video {
 	background-color: #DDD;
 	display: block;
-	max-width: 100%;
+	width: 100%;
+	aspect-ratio: 4 / 3;
+	object-fit: cover;
+	object-position: center;
 }
+#videos {
+	position: relative;
+}
+
 #self {
-	width: 50%;
-	max-width: 320px;
-	margin-bottom: 11px;
+	width: 30%;
+	position: absolute;
+	top: 11px;
+	left: 11px;
+	z-index: 1000; /* Prevent remote filters from hiding #self */
+	border: 1px solid #CCC;
 }
 .connected #self {
 	cursor: pointer;
@@ -75,18 +89,66 @@ video {
 
 /* Media Queries */
 @media screen and (min-width: 500px) {
+	#interface {
+		grid-template-columns: 1fr 1fr;
+		grid-template-rows: auto 1fr;
+	}
+
 	#header {
-		display: flex;
-		flex-direction: row-reverse;
-		align-items: baseline;
-		justify-content: flex-end;
+		grid-column: 1 / 3;
 	}
-	#header > * {
-		flex: 0 0 auto;
-	}
-	#header > h1 {
-		margin-bottom: 0;
-	}
+}
+
+#chat {
+	height: 100%;
+	min-height: 220px; /* Accommodate small, squarish screens */
+	border: 1px solid #999;
+	padding: 5.5px;
+	display: flex; /* Use columnar flexbox to constrain log */
+	flex-direction: column;
+	font-weight: normal;
+}
+#chat-log {
+	flex-grow: 1;
+	overflow: auto;
+	padding-bottom: 11px;
+	margin-bottom: 5.5px;
+	min-height: 0; /* Firefox fix */
+}
+#chat-form {
+	flex-grow: 0;
+	display: flex;
+}
+
+#chat-log li {
+	border-radius: 5.5px;
+	padding: 5.5px;
+	margin-bottom: 5.5px;
+	max-width: 60%;
+	clear: both;
+}
+#chat-log .peer {
+	background: #EEE;
+	float: left;
+}
+#chat-log .self {
+	background: #009;
+	color: #EEE;
+	float: right;
+}
+
+#chat-form button {
+	cursor: pointer;
+	flex: 0 0 auto;
+	background: #009;
+	color: #EEE;
+}
+#chat-form input {
+	flex: 1 1 100%;
+	padding: 9px;
+	margin-right: 5.5px;
+	border: 2px solid #999;
+	outline: 0;
 }
 
 /*Video Effects */
